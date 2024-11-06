@@ -1,0 +1,37 @@
+*{
+    margin: 0%;
+    padding: 0%;
+    box-sizing: border-box;
+}
+.input_class{
+    background-color: rgb(219, 212, 212);
+    padding:1rem;
+}
+#state,#area_type,#visualize,#district{
+    margin: 1rem 1rem 1rem 0.2rem;
+    padding: 0.5rem;
+    font-size: medium;
+    background-color: rgb(195, 211, 224);
+    border: none;
+    border-radius: 10px;
+    box-shadow: 1px 1px 1px 1px rgb(68, 53, 53);
+}
+#visualize{
+    cursor: pointer;
+    background-color: rgb(69, 69, 109);
+    color: white;
+    font-weight: bold;
+}
+#visualize:hover{
+    background-color: rgb(255, 0, 0);
+}
+.visual{
+    padding:1rem;
+    /* background-color: rgb(218, 212, 212); */
+}
+.visual>div{
+    margin-bottom: 1rem;
+    box-shadow: 1px 1px 1px 1px rgb(204, 198, 198);
+    border-radius: 5px;
+    border:none;
+}
