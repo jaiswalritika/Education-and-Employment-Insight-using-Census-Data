@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Visualization</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+</head>
+
+<body>
+    <div class="input_class">
+        <h1>Select a District and Area to Visualize</h1>
+        <form action="/visualize_dist" method="POST">
+            <label for="district">Select State:</label>
+            <select name="district" id="district">
+                {% for dist in data['district'] %}
+                <option value="{{ dist }}">{{ dist }}</option>
+                {% endfor %}
+            </select>
+
+            <label for="area_type">Select Area Type:</label>
+            <select name="area_type" id="area_type">
+                {% for area in data['dist_area_types'] %}
+                <option value="{{ area }}">{{ area }}</option>
+                {% endfor %}
+            </select>
+
+            <button type="submit" id="visualize">Visualize</button>
+        </form>
+    </div>
+    <div class="visual">
+        <h1>Visualizations of {{data["state"]}} Education and Workforce Data</h1>
+        <div id="chart_total"></div>
+        <div id="chart_males"></div>
+        <div id="chart_females"></div>
+        <div id="map"></div>
+    </div>
+    <script>
+        var fig_total = {{ data['fig_json'] | safe }};
+        var fig_males = {{ data['fig_json_males'] | safe }};
+        var fig_females = {{ data['fig_json_females'] | safe }};
+        // var map = {{ map_json | safe }};
+
+        Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
+        Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
+        Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
+        // Plotly.newPlot('map', map.data, map.layout);
+
+
+    </script>
+</body>
+
+</html>
