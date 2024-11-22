@@ -16,6 +16,10 @@ def index():
     area_types = df['Total/Rural/Urban'].unique()
     return render_template('index.html', states=states, area_types=area_types)
 
+@app.route('/home')
+def home():
+    return render_template('index.html')
+
 def bar_chart(dataset,params,region,area_type):
     fig = go.Figure()
     total_pop = dataset[dataset['Education level'] == 'Total']['total person'].values[0]

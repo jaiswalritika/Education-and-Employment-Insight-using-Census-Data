@@ -3,12 +3,32 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>Visualization</title>
+    <title>District Visualization</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <style>
+        .button {
+            background-color: #4CAF50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+    </style>
 </head>
 
 <body>
+    <div>
+        <a href="{{ url_for('home') }}" title="Home">
+            <i class="fa fa-home"></i> <!-- Font Awesome home icon -->
+        </a>
+    </div>
     <div class="visual">
         <h1>Visualizations of {{data["district"]}} Education and Workforce Data</h1>
         <div id="chart_total"></div>
@@ -26,8 +46,6 @@
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
         // Plotly.newPlot('map', map.data, map.layout);
-
-
     </script>
 </body>
 
