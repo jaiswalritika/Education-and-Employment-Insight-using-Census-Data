@@ -12,40 +12,47 @@ app = Flask(__name__)
 
 # Load data
 df = pd.read_csv('data/dataset.csv')
-sdf=pd.read_csv('data/dataset.csv')
+sdf = pd.read_csv('data/dataset.csv')
+literacy_df = pd.read_csv('data/literacy_percentage.csv')
 
-def create_state_literacy_map():
-    # Read GeoJSON file
+def create_map(map_type='population'):
     gdf = gpd.read_file('data/states.geojson')
     
-    # Process population data for mapping
-    total_data = df[(df['Total/Rural/Urban'] == 'Total') & (df['Education level'] == 'Total')]
-    population_data = total_data[['Area name', 'total person']].copy()
-    population_data.columns = ['state', 'population']
+    if map_type == 'population':
+        total_data = df[(df['Total/Rural/Urban'] == 'Total') & (df['Education level'] == 'Total')]
+        map_data = total_data[['Area name', 'total person']].copy()
+        map_data.columns = ['state', 'value']
+        title = 'Population by State'
+        label = 'Population'
+        hover_format = ':,.0f'
+    else:
+        map_data = literacy_df[['Area name', 'Literacy percentage']].copy()
+        map_data.columns = ['state', 'value']
+        title = 'Literacy Percentage by State'
+        label = 'Literacy %'
+        hover_format = ':.2f'
     
     # Clean state names
-    population_data['state'] = population_data['state'].str.strip().str.title()
+    map_data['state'] = map_data['state'].str.strip().str.title()
     name_replacements = {
         'Andaman & Nicobar Islands': 'Andaman & Nicobar Island',
         'Arunachal Pradesh': 'Arunanchal Pradesh',
         'Nct Of Delhi': 'NCT of Delhi'
     }
-    population_data['state'] = population_data['state'].replace(name_replacements)
+    map_data['state'] = map_data['state'].replace(name_replacements)
     
-    # Merge GeoJSON with population data
-    gdf = gdf.merge(population_data, left_on='ST_NM', right_on='state', how='left')
+    gdf = gdf.merge(map_data, left_on='ST_NM', right_on='state', how='left')
     
-    # Create choropleth map
     fig = px.choropleth(
         gdf,
         geojson=gdf.geometry,
         locations=gdf.index,
-        color='population',
+        color='value',
         color_continuous_scale='Viridis',
         hover_name='ST_NM',
-        hover_data={'population': ':,.0f'},  # Format population with commas
-        labels={'population': 'Population'},
-        title='Population by State'
+        hover_data={'value': hover_format},
+        labels={'value': label},
+        title=title
     )
     
     fig.update_geos(
@@ -67,7 +74,7 @@ def create_state_literacy_map():
             lataxis_range=[6, 38]
         )
     )
-
+    
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 @app.route('/')
@@ -78,8 +85,9 @@ def index():
 
 @app.route('/heatmap')
 def heatmap():
-    map_json = create_state_literacy_map()
-    return render_template('heatmap.html', map_json=map_json)
+    map_type = request.args.get('type', 'population')
+    map_json = create_map(map_type)
+    return render_template('heatmap.html', map_json=map_json, selected_type=map_type)
 
 @app.route('/home')
 def home():
