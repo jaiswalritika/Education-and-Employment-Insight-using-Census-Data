@@ -107,3 +107,8 @@ body {
     width: 100%;
     border-radius: 4px;
 }
+#pie_chart {
+    text-align: center;
+    width: 100%;
+    height: 400px; /* Adjust height as needed */
+}

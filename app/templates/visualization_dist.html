@@ -79,10 +79,14 @@
         var fig_total = {{ data['fig_json'] | safe }};
         var fig_males = {{ data['fig_json_males'] | safe }};
         var fig_females = {{ data['fig_json_females'] | safe }};
+        var fig_pie_chart = {{data.gender_pie_json | safe}};
+
 
         Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
+        Plotly.newPlot('pie_chart',fig_pie_chart.data,fig_pie_chart.layout);
+        
     </script>
 </body>
 

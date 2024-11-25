@@ -66,6 +66,9 @@
                 </div>
             </div>
             <div class="tab-pane fade" id="gender" role="tabpanel">
+                <div class="chart-container ">
+                    <div id="pie_chart"></div>
+                </div>
                 <div class="chart-container">
                     <div id="chart_males"></div>
                 </div>
@@ -106,10 +109,15 @@
         var fig_total = {{ data.fig_json | safe }};
         var fig_males = {{ data.fig_json_males | safe }};
         var fig_females = {{ data.fig_json_females | safe }};
+        var fig_pie_chart = {{data.gender_pie_json | safe}};
 
         Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
+        Plotly.newPlot('pie_chart',fig_pie_chart.data,fig_pie_chart.layout)
+        console.log('Pie Chart Data:', fig_pie_chart.data);
+        console.log('Pie Chart Layout:', fig_pie_chart.layout);
+
         // Plotly.newPlot('map', map.data, map.layout);
     </script>
 </body>

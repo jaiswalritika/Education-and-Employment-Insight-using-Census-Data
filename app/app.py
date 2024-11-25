@@ -23,9 +23,23 @@ def index():
 def home():
     return render_template('index.html')
 
+def draw_pie_chart(male_count, female_count):
+    
+    labels = ['Male', 'Female']
+    values = [male_count, female_count]
+
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+
+    fig.update_layout(title='Gender Distribution')
+
+    # Convert figure to JSON
+    fig_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+    return fig_json
+
+
 def bar_chart(dataset, params, region, area_type):
     fig = go.Figure()
-    total_pop = dataset[dataset['Education level'] == 'Total']['total person'].values[0]
+    total_pop = dataset[dataset['Education level'] == 'Total'][f'total {params}'].values[0]
     total_pop_list = [total_pop] * dataset.shape[0]
     if not dataset.empty:
         total_persons = dataset['total ' + params].astype(float)
@@ -163,6 +177,11 @@ def visualize():
     fig_json_males = bar_chart(state_data,'males',state,area_type)
     fig_json_females = bar_chart(state_data,'females',state,area_type)
 
+    male_count = state_data[state_data["Education level"]=="Total"]["total males"].iloc[0]
+    female_count = state_data[state_data["Education level"]=="Total"]["total females"].iloc[0]
+    print(type(male_count))
+    gender_pie_json=draw_pie_chart(male_count,female_count)
+
     global sdf
     sdf = pd.read_csv('data/states_data/'+state.title()+".csv")
     districts = sdf['Area name'].unique()
@@ -172,6 +191,7 @@ def visualize():
         'fig_json': fig_json_total,
         'fig_json_males': fig_json_males,
         'fig_json_females': fig_json_females,
+        'gender_pie_json':gender_pie_json,
         'state': state,
         'district': districts,
         'dist_area_types': dist_area_types,
@@ -188,10 +208,16 @@ def visualize_dist():
     fig_json_total=bar_chart(district_data,'person',district,area_type)
     fig_json_males=bar_chart(district_data,'males',district,area_type)
     fig_json_females=bar_chart(district_data,'females',district,area_type)
+
+    male_count = district_data[district_data["Education level"]=="Total"]["total males"].iloc[0]
+    female_count = district_data[district_data["Education level"]=="Total"]["total females"].iloc[0]
+    gender_pie_json=draw_pie_chart(male_count,female_count)
+
     data_dict={
         'fig_json':fig_json_total,
         'fig_json_males':fig_json_males,
         'fig_json_females':fig_json_females,
+        'gender_pie_json':gender_pie_json,
         'district':district
     }
     return render_template('visualization_dist.html', data=data_dict)
