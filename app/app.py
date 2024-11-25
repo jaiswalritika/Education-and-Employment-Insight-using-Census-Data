@@ -4,15 +4,13 @@ import json
 import plotly
 import plotly.graph_objs as go
 import plotly.express as px
-import geopandas as gpd
 
 app = Flask(__name__)
-
-
 
 # Load data
 df = pd.read_csv('data/dataset.csv')
 sdf=pd.read_csv('data/dataset.csv')
+
 @app.route('/')
 def index():
     states = df['Area name'].unique()
@@ -25,7 +23,7 @@ def home():
 
 def bar_chart(dataset, params, region, area_type):
     fig = go.Figure()
-    total_pop = dataset[dataset['Education level'] == 'Total']['total person'].values[0]
+    total_pop = dataset[dataset['Education level'] == 'Total'][f'total {params}'].values[0]
     total_pop_list = [total_pop] * dataset.shape[0]
     if not dataset.empty:
         total_persons = dataset['total ' + params].astype(float)
@@ -87,62 +85,126 @@ def bar_chart(dataset, params, region, area_type):
     fig_json_total = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return fig_json_total
 
-def calculate_literacy_rate(data):
-    total_data = data[data['Education level'] == 'Total']
-    literate_data = data[data['Education level'].isin(['Below Primary', 'Primary', 'Middle', 'Secondary', 'Higher Secondary', 'Graduate & Above'])]
-    
-    literacy_rates = {}
-    for state in total_data['Area name'].unique():
-        total_pop = total_data[total_data['Area name'] == state]['total person'].values[0]
-        literate_pop = literate_data[literate_data['Area name'] == state]['total person'].sum()
-        literacy_rates[state] = (literate_pop / total_pop) * 100
-    
-    return literacy_rates
+def gender_gap_chart(dataset, region, area_type):
+    fig = go.Figure()
+    if not dataset.empty:
+        male_employment = ((dataset['males main worker'].astype(float) + dataset['males marginal worker'].astype(float)) / dataset['total males'].astype(float)) * 100
+        female_employment = ((dataset['females main worker'].astype(float) + dataset['females marginal worker'].astype(float)) / dataset['total females'].astype(float)) * 100
+        gap = male_employment - female_employment
+        
+        fig.add_trace(go.Bar(
+            x=dataset['Education level'],
+            y=gap,
+            name='Gender Gap',
+            marker_color=['red' if x > 0 else 'green' for x in gap]
+        ))
+        
+        fig.update_layout(
+            title=f'Gender Gap in Employment - {region} ({area_type})',
+            xaxis_title='Education Level',
+            yaxis_title='Employment Gap (Male % - Female %)',
+            width=1200,
+            height=500,
+            showlegend=False
+        )
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-def create_literacy_map(literacy_rates):
-    # Convert literacy_rates dictionary to DataFrame
-    literacy_df = pd.DataFrame.from_dict(literacy_rates, orient='index', columns=['literacy_rate'])
-    literacy_df.index.name = 'state'
-    literacy_df = literacy_df.reset_index()
+def worker_distribution_chart(dataset, region, area_type):
+    fig = go.Figure()
+    if not dataset.empty:
+        main_workers = dataset['person main worker'].astype(float)
+        marginal_workers = dataset['person marginal worker'].astype(float)
+        unemployed = dataset['person unemployed'].astype(float)
+        maw = dataset['person MAW'].astype(float)
+        
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=main_workers, name='Main Workers'))
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=marginal_workers, name='Marginal Workers'))
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=unemployed, name='Unemployed'))
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=maw, name='MAW'))
+        
+        fig.update_layout(
+            barmode='stack',
+            title=f'Worker Distribution by Education Level - {region} ({area_type})',
+            xaxis_title='Education Level',
+            yaxis_title='Number of People',
+            width=1200,
+            height=500
+        )
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+def employment_trend_chart(dataset, region, area_type):
+    fig = go.Figure()
+    if not dataset.empty:
+        education_levels = dataset['Education level']
+        employment_rate = ((dataset['person main worker'].astype(float) + dataset['person marginal worker'].astype(float)) / dataset['total person'].astype(float)) * 100
+        
+        fig.add_trace(go.Scatter(
+            x=education_levels,
+            y=employment_rate,
+            mode='lines+markers',
+            name='Employment Rate'
+        ))
+        
+        fig.update_layout(
+            title=f'Employment Rate Trend by Education Level - {region} ({area_type})',
+            xaxis_title='Education Level',
+            yaxis_title='Employment Rate (%)',
+            width=1200,
+            height=500
+        )
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+def worker_type_pie(dataset):
+    total_main = dataset['person main worker'].astype(float).sum()
+    total_marginal = dataset['person marginal worker'].astype(float).sum()
+    total_unemployed = dataset['person unemployed'].astype(float).sum()
+    total_maw = dataset['person MAW'].astype(float).sum()
+    total_non_worker = dataset['person non worker'].astype(float).sum()
     
-    # Create choropleth map using plotly express
-    fig = px.choropleth(
-        literacy_df,
-        locations='state',
-        locationmode='geojson-id',
-        scope="asia",
-        center={"lat": 20.5937, "lon": 78.9629},
-        color='literacy_rate',
-        color_continuous_scale='RdYlGn',
-        range_color=(0, 100),
-        hover_name='state',
-        hover_data={'literacy_rate': ':.2f'},
-        labels={'literacy_rate': 'Literacy Rate (%)'},
-        title='Literacy Rate by State',
-    )
+    values = [total_main, total_marginal, total_unemployed, total_maw, total_non_worker]
+    labels = ['Main Workers', 'Marginal Workers', 'Unemployed', 'MAW', 'Non Workers']
     
-    fig.update_geos(
-        visible=False,
-        resolution=50,
-        showcountries=True,
-        countrycolor="Black",
-        showsubunits=True,
-        subunitcolor="Black",
-        fitbounds="locations"
+    fig = go.Figure(data=[go.Pie(labels=labels, values=values, hole=.3)])
+    fig.update_layout(
+        title='Distribution of Worker Types',
+        width=800,
+        height=600
     )
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+def gender_participation_ratio(dataset):
+    fig = go.Figure()
+    education_levels = dataset['Education level']
+    
+    male_ratio = (dataset['males main worker'].astype(float) + dataset['males marginal worker'].astype(float)) / dataset['total males'].astype(float) * 100
+    female_ratio = (dataset['females main worker'].astype(float) + dataset['females marginal worker'].astype(float)) / dataset['total females'].astype(float) * 100
+    
+    fig.add_trace(go.Bar(name='Male Participation', x=education_levels, y=male_ratio))
+    fig.add_trace(go.Bar(name='Female Participation', x=education_levels, y=female_ratio))
     
     fig.update_layout(
-        title_x=0.5,
-        width=800,
-        height=600,
-        margin={"r":0,"t":30,"l":0,"b":0},
-        geo=dict(
-            lonaxis_range=[ 68, 98 ],
-            lataxis_range=[ 6, 38 ],
-            projection_scale=4
-        )
+        barmode='relative',
+        title='Gender-wise Workforce Participation by Education Level',
+        xaxis_title='Education Level',
+        yaxis_title='Participation Rate (%)',
+        width=1200,
+        height=600
     )
-    
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+def education_impact_scatter(dataset):
+    fig = px.scatter(dataset, 
+        x='Education level',
+        y=((dataset['person main worker'].astype(float) + dataset['person marginal worker'].astype(float)) / dataset['total person'].astype(float) * 100),
+        size=dataset['total person'].astype(float),
+        color=((dataset['person unemployed'].astype(float) + dataset['person MAW'].astype(float)) / dataset['total person'].astype(float) * 100),
+        labels={
+            'y': 'Employment Rate (%)',
+            'color': 'Unemployment Rate (%)'
+        },
+        title='Education Impact on Employment (Size: Total Population)'
+    )
+    fig.update_layout(width=1200, height=600)
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 @app.route('/visualize', methods=['POST'])
@@ -150,18 +212,17 @@ def visualize():
     state = request.form.get('state')
     area_type = request.form.get('area_type')
     
-    # Calculate literacy rates for all states
-    total_data = df[df['Total/Rural/Urban'] == 'Total']
-    literacy_rates = calculate_literacy_rate(total_data)
-    
-    # Create map using geopandas
-    map_json = create_literacy_map(literacy_rates)
-    
-    # Existing visualization code
+    # Visualization code
     state_data = df[(df['Area name'] == state) & (df['Total/Rural/Urban'] == area_type)]
     fig_json_total = bar_chart(state_data,'person',state,area_type)
     fig_json_males = bar_chart(state_data,'males',state,area_type)
     fig_json_females = bar_chart(state_data,'females',state,area_type)
+    gender_gap = gender_gap_chart(state_data, state, area_type)
+    worker_dist = worker_distribution_chart(state_data, state, area_type)
+    emp_trend = employment_trend_chart(state_data, state, area_type)
+    worker_type_pie_chart = worker_type_pie(state_data)
+    gender_participation = gender_participation_ratio(state_data)
+    education_impact = education_impact_scatter(state_data)
 
     global sdf
     sdf = pd.read_csv('data/states_data/'+state.title()+".csv")
@@ -172,10 +233,15 @@ def visualize():
         'fig_json': fig_json_total,
         'fig_json_males': fig_json_males,
         'fig_json_females': fig_json_females,
+        'gender_gap': gender_gap,
+        'worker_dist': worker_dist,
+        'emp_trend': emp_trend,
+        'worker_type_pie': worker_type_pie_chart,
+        'gender_participation': gender_participation,
+        'education_impact': education_impact,
         'state': state,
         'district': districts,
-        'dist_area_types': dist_area_types,
-        'map_json': map_json
+        'dist_area_types': dist_area_types
     }
     return render_template('visualization.html', data=data_dict)
 

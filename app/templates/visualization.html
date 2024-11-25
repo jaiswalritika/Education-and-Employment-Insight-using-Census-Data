@@ -64,6 +64,19 @@
                         </div>
                     </div>
                 </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div id="worker-type-pie"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <div id="gender-participation"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="education-impact"></div>
+                    </div>
+                </div>
             </div>
             <div class="tab-pane fade" id="gender" role="tabpanel">
                 <div class="chart-container">
@@ -111,6 +124,10 @@
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
         // Plotly.newPlot('map', map.data, map.layout);
+
+        Plotly.newPlot('worker-type-pie', JSON.parse('{{ data.worker_type_pie | safe }}'));
+        Plotly.newPlot('gender-participation', JSON.parse('{{ data.gender_participation | safe }}'));
+        Plotly.newPlot('education-impact', JSON.parse('{{ data.education_impact | safe }}'));
     </script>
 </body>
 
