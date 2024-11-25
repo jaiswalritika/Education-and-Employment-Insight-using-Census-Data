@@ -1,0 +1,15 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "State Name"
+      },
+      "geometry": {
+        // State boundary coordinates
+      }
+    }
+    // ... Add all states
+  ]
+}

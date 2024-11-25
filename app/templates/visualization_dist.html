@@ -3,9 +3,9 @@
 
 <head>
     <meta charset="UTF-8">
-    <title>District Visualization</title>
+    <title>District Analysis</title>
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
         .button {
             background-color: #4CAF50;
@@ -20,43 +20,69 @@
             cursor: pointer;
             border-radius: 12px;
         }
+        .chart-container {
+            margin: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+        .chart-title {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+            font-size: 24px;
+        }
+        body {
+            background-color: #f5f5f5;
+            padding: 20px;
+        }
+        .back-button {
+            margin: 20px;
+        }
     </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
-    <div class="container">
-        <div class="row mt-3 mb-3">
-            <div class="col">
-                <div class="nav-controls">
-                    <a href="javascript:history.back()" class="nav-button">
-                        <i class="fas fa-arrow-left"></i> Back
-                    </a>
-                    <a href="{{ url_for('home') }}" class="nav-button">
-                        <i class="fas fa-home"></i> Home
-                    </a>
-                </div>
+    <div class="container-fluid">
+        <div class="back-button">
+            <a href="javascript:history.back()" class="btn btn-primary">&larr; Back</a>
+        </div>
+        
+        <h1 class="text-center mb-4">District Level Analysis: {{data.district}}</h1>
+
+        <div class="row">
+            <div class="col-12 chart-container">
+                <div class="chart-title">Overall Population Analysis</div>
+                <div id="chart_total"></div>
             </div>
         </div>
-        <div class="visual">
-            <h1>Visualizations of {{data["district"]}} Education and Workforce Data</h1>
-            <div id="chart_total"></div>
-            <div id="chart_males"></div>
-            <div id="chart_females"></div>
-            <div id="map"></div>
+
+        <div class="row">
+            <div class="col-12 chart-container">
+                <div class="chart-title">Male Population Analysis</div>
+                <div id="chart_males"></div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-12 chart-container">
+                <div class="chart-title">Female Population Analysis</div>
+                <div id="chart_females"></div>
+            </div>
         </div>
     </div>
+
     <script>
         var fig_total = {{ data['fig_json'] | safe }};
         var fig_males = {{ data['fig_json_males'] | safe }};
         var fig_females = {{ data['fig_json_females'] | safe }};
-        // var map = {{ map_json | safe }};
 
         Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
-        // Plotly.newPlot('map', map.data, map.layout);
     </script>
 </body>
 
