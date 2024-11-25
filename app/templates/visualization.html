@@ -21,15 +21,18 @@
             border-radius: 12px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
-    <div>
-        <a href="{{ url_for('home') }}" title="Home">
-            <i class="fa fa-home"></i> <!-- Font Awesome home icon -->
+    <div class="nav-controls">
+        <a href="javascript:history.back()" class="nav-button">
+            <i class="fas fa-arrow-left"></i> Back
         </a>
-        <a href="/" class="button">Home</a>
-        <a href="javascript:history.back()" class="button">Back</a>
+        <a href="{{ url_for('home') }}" class="nav-button">
+            <i class="fas fa-home"></i> Home
+        </a>
     </div>
     <div class="input_class">
         <h1>Select a District and Area to Visualize</h1>

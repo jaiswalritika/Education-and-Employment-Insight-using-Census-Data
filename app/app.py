@@ -28,13 +28,59 @@ def bar_chart(dataset,params,region,area_type):
         total_persons=dataset['total '+params].astype(float)
         total_employed = ((dataset[params+' main worker'].astype(float) + dataset[params+' marginal worker'].astype(float))/total_persons)*100
         total_unemmployed = ((dataset[params+' unemployed'].astype(float) + dataset[params+' MAW'].astype(float))/total_persons)*100
-        fig.add_trace(go.Bar(x=dataset['Education level'], y=(total_persons/total_pop_list)*100, name='Total %'))
-        fig.add_trace(go.Bar(x=dataset['Education level'], y=total_unemmployed, name='Unemployed %'))
-        fig.add_trace(go.Bar(x=dataset['Education level'], y=total_employed, name='Employed %'))
-        fig.update_layout(barmode='group', title=f'{region} ({area_type}) {params} Education and Workforce Data',
-                          xaxis_title='Education Level', yaxis_title='Percentage')
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=(total_persons/total_pop_list)*100, name='Total %', width=0.25))
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=total_unemmployed, name='Unemployed %', width=0.25))
+        fig.add_trace(go.Bar(x=dataset['Education level'], y=total_employed, name='Employed %', width=0.25))
+        
+        fig.update_layout(
+            barmode='group',
+            title={
+                'text': f'{region} ({area_type}) {params} Education and Workforce Data',
+                'y':0.95,
+                'x':0.5,
+                'xanchor': 'center',
+                'yanchor': 'top',
+                'font': dict(size=24)
+            },
+            xaxis_title={
+                'text': 'Education Level',
+                'font': dict(size=16)
+            },
+            yaxis_title={
+                'text': 'Percentage',
+                'font': dict(size=16)
+            },
+            width=1200,
+            height=700,
+            showlegend=True,
+            legend=dict(
+                font=dict(size=14),
+                yanchor="top",
+                y=0.99,
+                xanchor="right",
+                x=0.99
+            ),
+            plot_bgcolor='white',
+            xaxis=dict(
+                tickfont=dict(size=12),
+                showgrid=True,
+                gridwidth=1,
+                gridcolor='lightgray'
+            ),
+            yaxis=dict(
+                tickfont=dict(size=12),
+                showgrid=True,
+                gridwidth=1,
+                gridcolor='lightgray'
+            ),
+            margin=dict(l=50, r=50, t=80, b=50)
+        )
     else:
-        fig.update_layout(title="No data available for this state and area type.")
+        fig.update_layout(
+            title="No data available for this state and area type.",
+            width=1200,
+            height=700
+        )
     fig_json_total = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
     return fig_json_total
 

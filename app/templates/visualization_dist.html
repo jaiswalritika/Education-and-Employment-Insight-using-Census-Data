@@ -21,20 +21,31 @@
             border-radius: 12px;
         }
     </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body>
-    <div>
-        <a href="{{ url_for('home') }}" title="Home">
-            <i class="fa fa-home"></i> <!-- Font Awesome home icon -->
-        </a>
-    </div>
-    <div class="visual">
-        <h1>Visualizations of {{data["district"]}} Education and Workforce Data</h1>
-        <div id="chart_total"></div>
-        <div id="chart_males"></div>
-        <div id="chart_females"></div>
-        <div id="map"></div>
+    <div class="container">
+        <div class="row mt-3 mb-3">
+            <div class="col">
+                <div class="nav-controls">
+                    <a href="javascript:history.back()" class="nav-button">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                    <a href="{{ url_for('home') }}" class="nav-button">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </div>
+            </div>
+        </div>
+        <div class="visual">
+            <h1>Visualizations of {{data["district"]}} Education and Workforce Data</h1>
+            <div id="chart_total"></div>
+            <div id="chart_males"></div>
+            <div id="chart_females"></div>
+            <div id="map"></div>
+        </div>
     </div>
     <script>
         var fig_total = {{ data['fig_json'] | safe }};
