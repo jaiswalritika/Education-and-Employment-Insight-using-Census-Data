@@ -13,11 +13,73 @@ app = Flask(__name__)
 # Load data
 df = pd.read_csv('data/dataset.csv')
 sdf=pd.read_csv('data/dataset.csv')
+
+def create_state_literacy_map():
+    # Read GeoJSON file
+    gdf = gpd.read_file('data/states.geojson')
+    
+    # Process population data for mapping
+    total_data = df[(df['Total/Rural/Urban'] == 'Total') & (df['Education level'] == 'Total')]
+    population_data = total_data[['Area name', 'total person']].copy()
+    population_data.columns = ['state', 'population']
+    
+    # Clean state names
+    population_data['state'] = population_data['state'].str.strip().str.title()
+    name_replacements = {
+        'Andaman & Nicobar Islands': 'Andaman & Nicobar Island',
+        'Arunachal Pradesh': 'Arunanchal Pradesh',
+        'Nct Of Delhi': 'NCT of Delhi'
+    }
+    population_data['state'] = population_data['state'].replace(name_replacements)
+    
+    # Merge GeoJSON with population data
+    gdf = gdf.merge(population_data, left_on='ST_NM', right_on='state', how='left')
+    
+    # Create choropleth map
+    fig = px.choropleth(
+        gdf,
+        geojson=gdf.geometry,
+        locations=gdf.index,
+        color='population',
+        color_continuous_scale='Viridis',
+        hover_name='ST_NM',
+        hover_data={'population': ':,.0f'},  # Format population with commas
+        labels={'population': 'Population'},
+        title='Population by State'
+    )
+    
+    fig.update_geos(
+        fitbounds="locations",
+        visible=False,
+        center={"lat": 20.5937, "lon": 78.9629},
+    )
+    
+    fig.update_layout(
+        title_x=0.5,
+        width=None,
+        height=600,
+        margin={"r":0,"t":30,"l":0,"b":0},
+        autosize=True,
+        geo=dict(
+            projection_scale=1.5,
+            center=dict(lat=23.5937, lon=78.9629),
+            lonaxis_range=[68, 98],
+            lataxis_range=[6, 38]
+        )
+    )
+
+    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
 @app.route('/')
 def index():
     states = df['Area name'].unique()
     area_types = df['Total/Rural/Urban'].unique()
     return render_template('index.html', states=states, area_types=area_types)
+
+@app.route('/heatmap')
+def heatmap():
+    map_json = create_state_literacy_map()
+    return render_template('heatmap.html', map_json=map_json)
 
 @app.route('/home')
 def home():
