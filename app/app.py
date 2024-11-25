@@ -25,7 +25,7 @@ def create_map(map_type='population'):
         title = 'Population by State'
         label = 'Population'
         hover_format = ':,.0f'
-        new_entry = pd.DataFrame({'state': ['TELANGANA'], 'value': ["total person"]})
+        new_entry = pd.DataFrame({'state': 'TELANGANA', 'value': total_data[total_data["Area name"]=="ANDHRA PRADESH"]["total person"]})
         map_data = pd.concat([map_data, new_entry], ignore_index=True)
     else:
         map_data = literacy_df[['Area name', 'Literacy percentage']].copy()
@@ -33,7 +33,6 @@ def create_map(map_type='population'):
         title = 'Literacy Percentage by State'
         label = 'Literacy %'
         hover_format = ':.2f'
-        # map_data = map_data._append({'state': 'TELANGANA', 'value': literacy_df[literacy_df["Area name"]=="ANDHRA PRADESH"]["Literacy percentage"]}, ignore_index=True)
     
     # Clean state names
     map_data['state'] = map_data['state'].str.strip().str.title()
