@@ -45,45 +45,81 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
-<body>
-    <div class="container-fluid">
-        <div class="back-button">
-            <a href="javascript:history.back()" class="btn btn-primary">&larr; Back</a>
+<body class="bg-light">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Census Data Insights</a>
         </div>
-        
-        <h1 class="text-center mb-4">District Level Analysis: {{data.district}}</h1>
+    </nav>
 
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Overall Population Analysis</div>
-                <div id="chart_total"></div>
+    <div class="container mt-4">
+        <h2 class="text-center mb-4">{{ data.district }} - Analysis</h2>
+
+        <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="total-tab" data-bs-toggle="tab" href="#total" role="tab">Overall Data</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="gender-tab" data-bs-toggle="tab" href="#gender" role="tab">Gender Analysis</a>
+            </li>
+        </ul>
+
+        <div class="tab-content" id="dataTabContent">
+            <div class="tab-pane fade show active" id="total" role="tabpanel">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="chart-container">
+                            <div id="chart_total"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="worker-type-pie"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="worker-dist"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="emp-trend"></div>
+                    </div>
+                </div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Male Population Analysis</div>
-                <div id="chart_males"></div>
-            </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Female Population Analysis</div>
-                <div id="chart_females"></div>
+            <div class="tab-pane fade" id="gender" role="tabpanel">
+                <div class="chart-container">
+                    <div id="chart_males"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="chart_females"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="gender-participation"></div>
+                </div>
+                <div class="chart-container">
+                    <div id="gender-gap"></div>
+                </div>
             </div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        var fig_total = {{ data['fig_json'] | safe }};
-        var fig_males = {{ data['fig_json_males'] | safe }};
-        var fig_females = {{ data['fig_json_females'] | safe }};
+        var fig_total = {{ data.fig_json | safe }};
+        var fig_males = {{ data.fig_json_males | safe }};
+        var fig_females = {{ data.fig_json_females | safe }};
 
         Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
+        Plotly.newPlot('worker-type-pie', JSON.parse('{{ data.worker_type_pie | safe }}'));
+        Plotly.newPlot('gender-participation', JSON.parse('{{ data.gender_participation | safe }}'));
+        Plotly.newPlot('worker-dist', JSON.parse('{{ data.worker_dist | safe }}'));
+        Plotly.newPlot('emp-trend', JSON.parse('{{ data.emp_trend | safe }}'));
+        Plotly.newPlot('gender-gap', JSON.parse('{{ data.gender_gap | safe }}'));
     </script>
 </body>
-
 </html>

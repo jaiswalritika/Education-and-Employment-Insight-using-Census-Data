@@ -192,43 +192,6 @@ def gender_participation_ratio(dataset):
     )
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
-def education_impact_scatter(dataset):
-    fig = px.scatter(dataset, 
-        x='Education level',
-        y=((dataset['person main worker'].astype(float) + dataset['person marginal worker'].astype(float)) / dataset['total person'].astype(float) * 100),
-        size=dataset['total person'].astype(float),
-        color=((dataset['person unemployed'].astype(float) + dataset['person MAW'].astype(float)) / dataset['total person'].astype(float) * 100),
-        labels={
-            'y': 'Employment Rate (%)',
-            'color': 'Unemployment Rate (%)'
-        },
-        title='Education Impact on Employment (Size: Total Population)',
-        color_continuous_scale=['rgb(25,25,112)', 'rgb(65,105,225)', 'rgb(100,149,237)']  # Dark blue color scheme
-    )
-    
-    fig.update_layout(
-        width=1200, 
-        height=600,
-        paper_bgcolor='white',
-        plot_bgcolor='white',
-        title={
-            'font': {'size': 24, 'color': 'black'},
-            'x': 0.5,
-            'xanchor': 'center'
-        },
-        xaxis={'gridcolor': 'lightgray', 'gridwidth': 1},
-        yaxis={'gridcolor': 'lightgray', 'gridwidth': 1}
-    )
-    
-    fig.update_traces(
-        marker=dict(
-            line=dict(width=1, color='rgb(50,50,50)'),
-            opacity=0.7
-        )
-    )
-    
-    return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
-
 @app.route('/visualize', methods=['POST'])
 def visualize():
     state = request.form.get('state')
@@ -244,7 +207,6 @@ def visualize():
     emp_trend = employment_trend_chart(state_data, state, area_type)
     worker_type_pie_chart = worker_type_pie(state_data)
     gender_participation = gender_participation_ratio(state_data)
-    education_impact = education_impact_scatter(state_data)
 
     global sdf
     sdf = pd.read_csv('data/states_data/'+state.title()+".csv")
@@ -260,7 +222,6 @@ def visualize():
         'emp_trend': emp_trend,
         'worker_type_pie': worker_type_pie_chart,
         'gender_participation': gender_participation,
-        'education_impact': education_impact,
         'state': state,
         'district': districts,
         'dist_area_types': dist_area_types
@@ -272,15 +233,28 @@ def visualize_dist():
     global sdf
     district = request.form.get('district')
     area_type = request.form.get('area_type')
-    district_data = sdf[(sdf['Area name'] == district)& (sdf['Total/Rural/Urban'] == area_type) ]
-    fig_json_total=bar_chart(district_data,'person',district,area_type)
-    fig_json_males=bar_chart(district_data,'males',district,area_type)
-    fig_json_females=bar_chart(district_data,'females',district,area_type)
-    data_dict={
-        'fig_json':fig_json_total,
-        'fig_json_males':fig_json_males,
-        'fig_json_females':fig_json_females,
-        'district':district
+    district_data = sdf[(sdf['Area name'] == district) & (sdf['Total/Rural/Urban'] == area_type)]
+    
+    # Generate all visualizations for district
+    fig_json_total = bar_chart(district_data, 'person', district, area_type)
+    fig_json_males = bar_chart(district_data, 'males', district, area_type)
+    fig_json_females = bar_chart(district_data, 'females', district, area_type)
+    gender_gap = gender_gap_chart(district_data, district, area_type)
+    worker_dist = worker_distribution_chart(district_data, district, area_type)
+    emp_trend = employment_trend_chart(district_data, district, area_type)
+    worker_type_pie_chart = worker_type_pie(district_data)
+    gender_participation = gender_participation_ratio(district_data)
+    
+    data_dict = {
+        'fig_json': fig_json_total,
+        'fig_json_males': fig_json_males,
+        'fig_json_females': fig_json_females,
+        'gender_gap': gender_gap,
+        'worker_dist': worker_dist,
+        'emp_trend': emp_trend,
+        'worker_type_pie': worker_type_pie_chart,
+        'gender_participation': gender_participation,
+        'district': district
     }
     return render_template('visualization_dist.html', data=data_dict)
 

@@ -71,7 +71,12 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <div id="education-impact"></div>
+                        <div id="worker-dist"></div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div id="emp-trend"></div>
                     </div>
                 </div>
             </div>
@@ -127,7 +132,8 @@
 
         Plotly.newPlot('worker-type-pie', JSON.parse('{{ data.worker_type_pie | safe }}'));
         Plotly.newPlot('gender-participation', JSON.parse('{{ data.gender_participation | safe }}'));
-        Plotly.newPlot('education-impact', JSON.parse('{{ data.education_impact | safe }}'));
+        Plotly.newPlot('worker-dist', JSON.parse('{{ data.worker_dist | safe }}'));
+        Plotly.newPlot('emp-trend', JSON.parse('{{ data.emp_trend | safe }}'));
     </script>
 </body>
 
