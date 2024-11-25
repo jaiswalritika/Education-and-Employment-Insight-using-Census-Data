@@ -202,9 +202,31 @@ def education_impact_scatter(dataset):
             'y': 'Employment Rate (%)',
             'color': 'Unemployment Rate (%)'
         },
-        title='Education Impact on Employment (Size: Total Population)'
+        title='Education Impact on Employment (Size: Total Population)',
+        color_continuous_scale=['rgb(25,25,112)', 'rgb(65,105,225)', 'rgb(100,149,237)']  # Dark blue color scheme
     )
-    fig.update_layout(width=1200, height=600)
+    
+    fig.update_layout(
+        width=1200, 
+        height=600,
+        paper_bgcolor='white',
+        plot_bgcolor='white',
+        title={
+            'font': {'size': 24, 'color': 'black'},
+            'x': 0.5,
+            'xanchor': 'center'
+        },
+        xaxis={'gridcolor': 'lightgray', 'gridwidth': 1},
+        yaxis={'gridcolor': 'lightgray', 'gridwidth': 1}
+    )
+    
+    fig.update_traces(
+        marker=dict(
+            line=dict(width=1, color='rgb(50,50,50)'),
+            opacity=0.7
+        )
+    )
+    
     return json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
 
 @app.route('/visualize', methods=['POST'])
