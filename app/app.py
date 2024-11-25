@@ -14,10 +14,11 @@ app = Flask(__name__)
 df = pd.read_csv('data/dataset.csv')
 sdf = pd.read_csv('data/dataset.csv')
 literacy_df = pd.read_csv('data/literacy_percentage.csv')
+geojsondf = gpd.read_file('data/states.geojson')
 
 def create_map(map_type='population'):
-    gdf = gpd.read_file('data/states.geojson')
-    
+    global geojsondf
+    gdf=geojsondf
     if map_type == 'population':
         total_data = df[(df['Total/Rural/Urban'] == 'Total') & (df['Education level'] == 'Total')]
         map_data = total_data[['Area name', 'total person']].copy()
