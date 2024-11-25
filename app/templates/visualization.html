@@ -9,23 +9,7 @@
     <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <link rel="stylesheet" href="{{url_for('static',filename='css/style.css')}}">
-    <style>
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 12px;
-        }
-    </style>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
 </head>
 
 <body class="bg-light">
@@ -46,28 +30,23 @@
                 <a class="nav-link" id="gender-tab" data-bs-toggle="tab" href="#gender" role="tab">Gender Analysis</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="district-tab" data-bs-toggle="tab" href="#district" role="tab">District Analysis</a>
+                <a class="nav-link" id="district-tab" data-bs-toggle="tab" href="#district" role="tab">District
+                    Analysis</a>
             </li>
         </ul>
 
         <div class="tab-content" id="dataTabContent">
             <div class="tab-pane fade show active" id="total" role="tabpanel">
-                <div class="row">
-                    <div class="col-md-8">
-                        <div class="chart-container">
-                            <div id="chart_total"></div>
-                        </div>
-                    </div>
-                    <div class="col-md-4">
-                        <div class="map-container">
-                            {{ data.map_html | safe }}
-                        </div>
-                    </div>
+                <div class="chart-container">
+                    <div id="chart_total"></div>
+                </div>
+                <div class="chart-container ">
+                    <div id="pie_chart_literate"></div>
                 </div>
             </div>
             <div class="tab-pane fade" id="gender" role="tabpanel">
                 <div class="chart-container ">
-                    <div id="pie_chart"></div>
+                    <div id="pie_chart_gender"></div>
                 </div>
                 <div class="chart-container">
                     <div id="chart_males"></div>
@@ -109,15 +88,15 @@
         var fig_total = {{ data.fig_json | safe }};
         var fig_males = {{ data.fig_json_males | safe }};
         var fig_females = {{ data.fig_json_females | safe }};
-        var fig_pie_chart = {{data.gender_pie_json | safe}};
+        var fig_pie_chart_gender = {{ data.gender_pie_json | safe}};
+        var fig_pie_chart_literate = {{ data.literacy_pie_json | safe}}; 
 
         Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
         Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
         Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
-        Plotly.newPlot('pie_chart',fig_pie_chart.data,fig_pie_chart.layout)
-        console.log('Pie Chart Data:', fig_pie_chart.data);
-        console.log('Pie Chart Layout:', fig_pie_chart.layout);
-
+        Plotly.newPlot('pie_chart_gender', fig_pie_chart_gender.data, fig_pie_chart_gender.layout)
+        Plotly.newPlot('pie_chart_literate', fig_pie_chart_literate.data, fig_pie_chart_literate.layout)
+        console.log(fig_pie_chart_literate)
         // Plotly.newPlot('map', map.data, map.layout);
     </script>
 </body>

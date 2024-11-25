@@ -85,14 +85,14 @@ def heatmap():
 def home():
     return render_template('index.html')
 
-def draw_pie_chart(male_count, female_count):
+def draw_pie_chart(male_count, female_count,label1,label2,chart_name):
     
-    labels = ['Male', 'Female']
+    labels = [label1, label2]
     values = [male_count, female_count]
 
     fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
 
-    fig.update_layout(title='Gender Distribution')
+    fig.update_layout(title=f'{chart_name} Distribution')
 
     # Convert figure to JSON
     fig_json = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
@@ -241,8 +241,11 @@ def visualize():
 
     male_count = state_data[state_data["Education level"]=="Total"]["total males"].iloc[0]
     female_count = state_data[state_data["Education level"]=="Total"]["total females"].iloc[0]
-    print(type(male_count))
-    gender_pie_json=draw_pie_chart(male_count,female_count)
+    gender_pie_json=draw_pie_chart(male_count,female_count,"Male","Female","Gender")
+
+    literate_count = state_data[state_data["Education level"]=="Literate"]["total person"].iloc[0]
+    illiterate_count = state_data[state_data["Education level"]=="Illiterate"]["total person"].iloc[0]
+    literacy_pie_json=draw_pie_chart(literate_count,illiterate_count,"Literate","Illiterate","Literacy")
 
     global sdf
     sdf = pd.read_csv('data/states_data/'+state.title()+".csv")
@@ -254,6 +257,7 @@ def visualize():
         'fig_json_males': fig_json_males,
         'fig_json_females': fig_json_females,
         'gender_pie_json':gender_pie_json,
+        'literacy_pie_json':literacy_pie_json,
         'state': state,
         'district': districts,
         'dist_area_types': dist_area_types,
@@ -273,13 +277,18 @@ def visualize_dist():
 
     male_count = district_data[district_data["Education level"]=="Total"]["total males"].iloc[0]
     female_count = district_data[district_data["Education level"]=="Total"]["total females"].iloc[0]
-    gender_pie_json=draw_pie_chart(male_count,female_count)
+    gender_pie_json=draw_pie_chart(male_count,female_count,"Male","Female","Gender")
+
+    literate_count = district_data[district_data["Education level"]=="Literate"]["total person"].iloc[0]
+    illiterate_count = district_data[district_data["Education level"]=="Illiterate"]["total person"].iloc[0]
+    literacy_pie_json=draw_pie_chart(literate_count,illiterate_count,"Literate","Illiterate","Literacy")
 
     data_dict={
         'fig_json':fig_json_total,
         'fig_json_males':fig_json_males,
         'fig_json_females':fig_json_females,
         'gender_pie_json':gender_pie_json,
+        'literacy_pie_json':literacy_pie_json,
         'district':district
     }
     return render_template('visualization_dist.html', data=data_dict)
