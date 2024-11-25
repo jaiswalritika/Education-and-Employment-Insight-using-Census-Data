@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Data Visualization{% endblock %}
+{% block content %}
+    <div class="container mt-5">
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <select class="form-select" id="mapType" onchange="updateMap(this.value)">
+                    <option value="population" {% if selected_type == 'population' %}selected{% endif %}>Population Distribution</option>
+                    <option value="literacy" {% if selected_type == 'literacy' %}selected{% endif %}>Literacy Percentage</option>
+                </select>
+            </div>
+        </div>
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <div id="map" style="width: 100%; height: 700px;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var graphs = {{ map_json | safe }};
+            Plotly.newPlot('map', graphs.data, graphs.layout);
+        });
+
+        function updateMap(type) {
+            window.location.href = '/heatmap?type=' + type;
+        }
+    </script>
+{% endblock %}}

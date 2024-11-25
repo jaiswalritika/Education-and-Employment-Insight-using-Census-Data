@@ -74,8 +74,6 @@
                     layer.on('click', function() {
                         var state = feature.properties.name;
                         $.post("/visualize", { state: state, area_type: "Total" }, function(response) {
-                            // Handle the response to update the visualization
-                            // You can redirect or update the page content here
                         });
                     });
                 }

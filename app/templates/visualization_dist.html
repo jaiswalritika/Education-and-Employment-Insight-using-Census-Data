@@ -1,89 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+{% extends "base.html" %}
+{% block title %}Data Visualization{% endblock %}
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center mb-4">{{ data.district }} - Analysis</h2>
 
-<head>
-    <meta charset="UTF-8">
-    <title>District Analysis</title>
-    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        .button {
-            background-color: #4CAF50;
-            border: none;
-            color: white;
-            padding: 10px 20px;
-            text-align: center;
-            text-decoration: none;
-            display: inline-block;
-            font-size: 16px;
-            margin: 4px 2px;
-            cursor: pointer;
-            border-radius: 12px;
-        }
-        .chart-container {
-            margin: 20px;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-            background-color: white;
-        }
-        .chart-title {
-            text-align: center;
-            margin-bottom: 20px;
-            color: #333;
-            font-size: 24px;
-        }
-        body {
-            background-color: #f5f5f5;
-            padding: 20px;
-        }
-        .back-button {
-            margin: 20px;
-        }
-    </style>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-</head>
+    <ul class="nav nav-tabs" id="dataTabs" role="tablist">
+        <li class="nav-item">
+            <a class="nav-link active" id="total-tab" data-bs-toggle="tab" href="#total" role="tab">Overall Data</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" id="gender-tab" data-bs-toggle="tab" href="#gender" role="tab">Gender Analysis</a>
+        </li>
+    </ul>
 
-<body>
-    <div class="container-fluid">
-        <div class="back-button">
-            <a href="javascript:history.back()" class="btn btn-primary">&larr; Back</a>
-        </div>
-        
-        <h1 class="text-center mb-4">District Level Analysis: {{data.district}}</h1>
-
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Overall Population Analysis</div>
+    <div class="tab-content" id="dataTabContent">
+        <div class="tab-pane fade show active" id="total" role="tabpanel">
+            <div class="chart-container">
                 <div id="chart_total"></div>
             </div>
-        </div>
-
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Male Population Analysis</div>
-                <div id="chart_males"></div>
+            <div class="chart-container ">
+                <div id="pie_chart_literate"></div>
             </div>
         </div>
-
-        <div class="row">
-            <div class="col-12 chart-container">
-                <div class="chart-title">Female Population Analysis</div>
+        <div class="tab-pane fade" id="gender" role="tabpanel">
+            <div class="chart-container ">
+                <div id="pie_chart"></div>
+            </div>
+            <div class="chart-container">
+                <div id="chart_males"></div>
+            </div>
+            <div class="chart-container">
                 <div id="chart_females"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        var fig_total = {{ data['fig_json'] | safe }};
-        var fig_males = {{ data['fig_json_males'] | safe }};
-        var fig_females = {{ data['fig_json_females'] | safe }};
 
-        Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
-        Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
-        Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
-    </script>
-</body>
+<script>
+    var fig_total = {{ data.fig_json | safe }};
+    var fig_males = {{ data.fig_json_males | safe }};
+    var fig_females = {{ data.fig_json_females | safe }};
+    var fig_pie_chart_gender = {{ data.gender_pie_json | safe}};
+    var fig_pie_chart_literate = {{ data.literacy_pie_json | safe}};
 
-</html>
+
+    Plotly.newPlot('chart_total', fig_total.data, fig_total.layout);
+    Plotly.newPlot('chart_males', fig_males.data, fig_males.layout);
+    Plotly.newPlot('chart_females', fig_females.data, fig_females.layout);
+    Plotly.newPlot('pie_chart', fig_pie_chart_gender.data, fig_pie_chart_gender.layout)
+    Plotly.newPlot('pie_chart_literate', fig_pie_chart_literate.data, fig_pie_chart_literate.layout)
+
+    // Plotly.newPlot('map', map.data, map.layout);
+</script>
+{% endblock %}
