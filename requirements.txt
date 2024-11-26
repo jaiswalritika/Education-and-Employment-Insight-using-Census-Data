@@ -3,3 +3,5 @@ pandas
 json
 plotly
 geopandas
+requests
+pathlib

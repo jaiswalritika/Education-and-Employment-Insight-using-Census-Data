@@ -17,3 +17,5 @@ cd app
 python3 app.py
 ```
 The results will be saved in the `output` directory.
+
+## IMPORTANT NOTICE : App will download 58 MB file So it will required internet connection

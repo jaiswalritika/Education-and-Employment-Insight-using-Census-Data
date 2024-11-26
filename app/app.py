@@ -5,16 +5,59 @@ import plotly
 import plotly.graph_objs as go
 import plotly.express as px
 import geopandas as gpd
+import os
+import requests
+from pathlib import Path
 
 app = Flask(__name__)
 
+def get_confirm_token(response):
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            return value
+    return None
 
+def download_geojson():
+    geojson_path = 'data/states.geojson'
+    Path('data').mkdir(exist_ok=True)
+    if os.path.exists(geojson_path):
+        return True
+    file_id = "1MCghW5iLGQuhhTr1S0WwPsLTI6VrpNm8"
+    
+    try:
+        print("Downloading GeoJSON file, Data is 58MB, it may take a while...")
+        session = requests.Session()
+        URL = f"https://docs.google.com/uc?export=download&id={file_id}"
+        response = session.get(URL, stream=True)
+        token = get_confirm_token(response)
 
-# Load data
-df = pd.read_csv('data/dataset.csv')
-sdf = pd.read_csv('data/dataset.csv')
-literacy_df = pd.read_csv('data/literacy_percentage.csv')
-geojsondf = gpd.read_file('data/states.geojson')
+        if token:
+            params = {'id': file_id, 'confirm': token}
+            response = session.get(URL, params=params, stream=True)
+        with open(geojson_path, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=32768):
+                if chunk:
+                    f.write(chunk)
+        
+        print("Download complete!")
+        return True
+        
+    except Exception as e:
+        print(f"Error downloading GeoJSON file: {e}")
+        return False
+
+def initialize_data():
+    """Initialize all data required for the application"""
+    global df, sdf, literacy_df, geojsondf
+    if not download_geojson():
+        raise Exception("Failed to download required GeoJSON file")
+        os._exit(1)
+    
+    # Load all data
+    df = pd.read_csv('data/dataset.csv')
+    sdf = pd.read_csv('data/dataset.csv')
+    literacy_df = pd.read_csv('data/literacy_percentage.csv')
+    geojsondf = gpd.read_file('data/states.geojson')
 
 def create_map(map_type='population'):
     global geojsondf
@@ -240,4 +283,5 @@ def visualize_dist():
     return render_template('visualization_dist.html', data=data_dict)
 
 if __name__ == "__main__":
+    initialize_data()
     app.run(debug=True)
