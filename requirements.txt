@@ -4,4 +4,3 @@ plotly
 geopandas
 requests
 pathlib
-gunicorn
