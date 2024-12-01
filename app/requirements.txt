@@ -1,6 +1,5 @@
 Flask
 pandas
-json
 plotly
 geopandas
 requests
